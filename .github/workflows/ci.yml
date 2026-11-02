@@ -18,4 +18,4 @@ jobs:
 
       - name: Test monitoring script (expect exit code 0)
         run: |
-          ./check_api.sh https://httpbin.org/status/200
+          bash check_api.sh https://httpbin.org/status/200
