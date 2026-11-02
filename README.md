@@ -136,6 +136,3 @@ ssh user@server.example.com "curl -s http://localhost:80"
 - `main` — защищённая ветка, изменения попадают только через Pull Request
 - `feature/monitoring` — рабочая ветка для разработки
 
-## Лицензия
-
-MIT (уточняется)
