@@ -1,48 +1,33 @@
 # Infra Monitoring Project
 
-Система мониторинга инфраструктуры: сбор метрик, логов и состояния сервисов с централизованным дашбордом и алертингом.
+Учебный проект по мониторингу инфраструктуры: bash-скрипты для проверки доступности API и анализа логов, плюс docker-compose-стенд с nginx-прокси.
 
-## Возможности
+## Что есть в проекте
 
-- Сбор метрик с серверов, контейнеров и сетевого оборудования
-- Агрегация и хранение временных рядов
-- Визуализация состояния инфраструктуры на дашбордах
-- Алертинг по порогам и аномалиям (уведомления в мессенджеры и почту)
-- Централизованный сбор и поиск по логам
-
-## Архитектура
-
-```
-┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-│  Экспортеры │──▶│  Коллектор  │──▶│   Хранилище │
-│  метрик     │   │  (агенты)   │   │  (TSDB)     │
-└─────────────┘   └─────────────┘   └──────┬──────┘
-                                           │
-                                    ┌──────▼──────┐
-                                    │ Дашборды /  │
-                                    │ Алертинг    │
-                                    └─────────────┘
-```
+- `check_api.sh` — проверка доступности API: делает HTTP-запрос через `curl`, возвращает код 0, если ответ 200, и 1 в остальных случаях
+- `analyze_logs.sh` — генерирует тестовый `access.log` (350 строк) и выводит статистику: общее число запросов, топ-3 IP, количество ответов 4xx/5xx
+- `docker-compose.yml` + `nginx.conf` — стенд из двух контейнеров: `api` (hashicorp/http-echo, отвечает «Monitoring Service Active» на порту 8080) и `proxy` (nginx:alpine, проксирует порт 80 на `api:8080`), связанных внутренней сетью Docker
+- `.github/workflows/ci.yml` — CI-пайплайн на Pull Request: проверка синтаксиса скриптов (`bash -n`) и тест `check_api.sh` по адресу https://httpbin.org/status/200 с ожиданием кода возврата 0
 
 ## Технологический стек
 
-- **Сбор метрик:** Prometheus / exporters (node_exporter, blackbox_exporter)
-- **Визуализация:** Grafana
-- **Логи:** Loki + Promtail
-- **Алертинг:** Alertmanager
-- **Развёртывание:** Docker Compose
+- **Скрипты:** Bash, curl, awk/grep/sort
+- **Контейнеры:** Docker Compose (hashicorp/http-echo, nginx:alpine)
+- **CI:** GitHub Actions
 
 ## Структура проекта
 
 ```
 infra-monitoring-project/
-├── README.md            # Описание проекта (этот файл)
-├── .gitignore           # Исключения для git
-├── docker-compose.yml   # Оркестрация сервисов мониторинга
-├── prometheus/          # Конфигурация Prometheus
-├── grafana/             # Дашборды и provisioning Grafana
-├── alertmanager/        # Конфигурация алертинга
-└── docs/                # Дополнительная документация
+├── README.md               # Описание проекта (этот файл)
+├── .gitignore              # Исключения для git
+├── check_api.sh            # Проверка доступности API
+├── analyze_logs.sh         # Генерация и анализ тестового access.log
+├── access.log              # Пример лога (генерируется скриптом)
+├── docker-compose.yml      # Стенд: api (http-echo) + proxy (nginx)
+├── nginx.conf              # Проксирование :80 -> api:8080
+└── .github/workflows/
+    └── ci.yml              # CI-пайплайн для Pull Request
 ```
 
 ## Быстрый старт
@@ -52,8 +37,15 @@ infra-monitoring-project/
 git clone https://github.com/MarkelovMR/infra-monitoring-project.git
 cd infra-monitoring-project
 
-# Запустить стек (появится по мере развития проекта)
+# Проверить доступность API
+./check_api.sh https://httpbin.org/status/200
+
+# Сгенерировать и разобрать тестовый лог
+./analyze_logs.sh
+
+# Поднять docker-compose-стенд
 docker compose up -d
+curl http://localhost:80   # -> Monitoring Service Active
 ```
 
 ## Безопасная передача файлов на удалённый сервер
