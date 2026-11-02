@@ -1,0 +1,62 @@
+# ===== Логи =====
+*.log
+logs/
+log/
+
+# ===== Временные файлы =====
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+.cache/
+
+# ===== Артефакты сборки =====
+build/
+dist/
+target/
+out/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.class
+*.jar
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ===== Node.js =====
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ===== Go / Rust =====
+bin/
+pkg/
+*.test
+Cargo.lock
+target/
+
+# ===== Инфраструктура и окружение =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.terraform/
+*.tfstate*
+
+# ===== IDE и ОС =====
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
